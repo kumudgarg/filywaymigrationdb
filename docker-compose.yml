@@ -5,7 +5,7 @@ networks:
 
 services:
 
-  db:
+  mydb:
     container_name: db
     image: mysql:8
     restart: always
@@ -31,13 +31,11 @@ services:
     ports:
       - 8080:8080
     environment:
-      - MYSQL_URI=jdbc:mysql://db:3306/flyway_demo
-      - HIBERNATE_PROP=org.hibernate.dialect.MySQL5InnoDBDialect
+      - MYSQL_URI=jdbc:mysql://mydb:3306/flyway_demo
       - MYSQL_USER=kumud
       - MYSQL_PASSWORD=11Ektec033
-      - DATABASE_NAME=flyway_demo
     depends_on:
-      - db
+      - mydb
     volumes:
       - /data/user_info
     networks:
