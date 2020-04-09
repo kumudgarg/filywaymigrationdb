@@ -1,0 +1,1 @@
+INSERT INTO users(username, firstname, lastname, address, companyname, jobType, salary) VALUES('Rahul003', 'RAhul', 'joshi', 'DLF,phase2', 'thoughtworks', 'IT', '30000')

@@ -1,0 +1,1 @@
+ALTER TABLE users add column address varchar(100);

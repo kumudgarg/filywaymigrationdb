@@ -1,0 +1,70 @@
+version: '3.1'
+
+networks:
+  user-mysql:
+
+services:
+
+  db:
+    container_name: db
+    image: mysql:8
+    restart: always
+    volumes:
+      - /data/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=flyway_demo
+      - MYSQL_USER=kumud
+      - MYSQL_ROOT_HOST=db
+      - MYSQL_PASSWORD=11Ektec033
+    ports:
+      - 3307:3306
+    networks:
+      - user-mysql
+
+  user-info-app:
+    restart: on-failure
+    image: user_info
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - MYSQL_URI=jdbc:mysql://db:3306/flyway_demo
+      - HIBERNATE_PROP=org.hibernate.dialect.MySQL5InnoDBDialect
+      - MYSQL_USER=kumud
+      - MYSQL_PASSWORD=11Ektec033
+      - DATABASE_NAME=flyway_demo
+    depends_on:
+      - db
+    volumes:
+      - /data/user_info
+    networks:
+      -  user-mysql
+
+
+
+
+
+#  flyway_migration:
+#    container_name: flyway_migration
+#    image: boxfuse/flyway
+#    command: -url=jdbc:mysql://172.16.238.1:3306/flyway_demo -schemas=flyway_demo -user=root -password=11Ektec033 migrate
+#    volumes:
+#      - ./db:/flyway/sql
+#    networks:
+#      backendnetwork:
+
+
+
+
+#  rabbitmq:
+#    container_name: rabbitmq
+#    image: 'rabbitmq:management'
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    networks:
+#      backendnetwork:
+#        ipv4_address: '172.16.238.4'
