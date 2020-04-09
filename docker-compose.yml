@@ -5,64 +5,55 @@ networks:
 
 services:
 
-  mydb:
-    container_name: db
-    image: mysql:8
-    restart: always
-    volumes:
-      - /data/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=flyway_demo
-      - MYSQL_USER=kumud
-      - MYSQL_ROOT_HOST=db
-      - MYSQL_PASSWORD=11Ektec033
-    ports:
-      - 3307:3306
-    networks:
-      - user-mysql
-
   user-info-app:
-    restart: on-failure
+    container_name: user_app
     image: user_info
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    build: .
     ports:
       - 8080:8080
     environment:
-      - MYSQL_URI=jdbc:mysql://mydb:3306/flyway_demo
+      - MYSQL_URI=jdbc:mysql://db/flyway_demo
       - MYSQL_USER=kumud
-      - MYSQL_PASSWORD=11Ektec033
+      - MYSQL_PASSWORD=kumud
     depends_on:
       - mydb
     volumes:
       - /data/user_info
     networks:
-      -  user-mysql
+      - user-mysql
+  mydb:
+    container_name: db
+    image: mysql:8
+    restart: always
+    volumes:
+      - /Users/kumud.garg/Documents/rabbitmq/mysql/:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=flyway_demo
+      - MYSQL_USER=kumud
+      - MYSQL_PASSWORD=kumud
+    ports:
+      - 3307:3306
+    networks:
+      - user-mysql
 
+  flyway_migration:
+    container_name: flyway_migration
+    image: boxfuse/flyway
+    command: -url=jdbc:mysql://db -schemas=flyway_demo -user=kumud -password=kumud migrate
+    volumes:
+      - ./db:/flyway/sql
+    networks:
+      - user-mysql
+    depends_on:
+      - mydb
 
+  rabbitmq:
+    container_name: rabbitmq
+    image: 'rabbitmq:management'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - user-mysql
 
-
-
-#  flyway_migration:
-#    container_name: flyway_migration
-#    image: boxfuse/flyway
-#    command: -url=jdbc:mysql://172.16.238.1:3306/flyway_demo -schemas=flyway_demo -user=root -password=11Ektec033 migrate
-#    volumes:
-#      - ./db:/flyway/sql
-#    networks:
-#      backendnetwork:
-
-
-
-
-#  rabbitmq:
-#    container_name: rabbitmq
-#    image: 'rabbitmq:management'
-#    ports:
-#      - "5672:5672"
-#      - "15672:15672"
-#    networks:
-#      backendnetwork:
-#        ipv4_address: '172.16.238.4'
