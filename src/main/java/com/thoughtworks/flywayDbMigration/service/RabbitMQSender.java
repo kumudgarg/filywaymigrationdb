@@ -20,7 +20,7 @@ public class RabbitMQSender {
     private String routingKey;
 
     public void send(UserDTO userDTO){
-        rabbitTemplate.convertAndSend("direct", "routingKey", userDTO);
+        rabbitTemplate.convertAndSend(exchange, "routingKey", userDTO);
         System.out.println("Send msg = " + userDTO );
     }
 

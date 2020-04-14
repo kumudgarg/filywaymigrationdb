@@ -27,7 +27,7 @@ public class RabbitMqConfig {
 
     @Bean
     Queue queue(){
-        return new Queue("abcd.queue", false);
+        return new Queue("abcd.queue", true,false,false);
     }
 
     @Bean
@@ -36,8 +36,8 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public Binding binding(Queue queue, DirectExchange directExchange){
-        return BindingBuilder.bind(queue).to(directExchange).with("routingKey");
+    public Binding binding(Queue queue, DirectExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange).with("routingKey");
     }
 
     @Bean
@@ -51,13 +51,13 @@ public class RabbitMqConfig {
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
         return rabbitTemplate;
     }
-    @Bean
-    MessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory){
-        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
-        simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
-        simpleMessageListenerContainer.setQueues(queue());
-        return simpleMessageListenerContainer;
-    }
+//    @Bean
+//    MessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory){
+//        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
+//        simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
+//        simpleMessageListenerContainer.setQueues(queue());
+//        return simpleMessageListenerContainer;
+//    }
 
 
 }
