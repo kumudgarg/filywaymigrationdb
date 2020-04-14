@@ -17,18 +17,20 @@ public class UserService {
     @Autowired
     private UserRepo userRepo;
 
-//    @Autowired
-//    private RabbitMQSender rabbitMQSender;
+    @Autowired
+    private RabbitMQSender rabbitMQSender;
 
     public List<User> getAllUsers() {
         List<User> allUsers = userRepo.findAll();
-
         return allUsers;
     }
 
     public User getById(Long id) {
-        User user = userRepo.findById(id).get();
-        return user;
+        Optional<User> user = userRepo.findById(id);
+        if (user == null) {
+            throw new UserNotPresentException("no user present", HttpStatus.NO_CONTENT);
+        }
+        return user.get();
     }
 
     public Long addUser(UserDTO userDTO) {
@@ -41,17 +43,33 @@ public class UserService {
         user.setJobType(userDTO.getJobType());
         user.setSalary(userDTO.getSalary());
         userRepo.save(user);
-        //rabbitMQSender.send(userDTO);
+        rabbitMQSender.send(userDTO);
         return user.getId();
     }
 
     public User editUser(Long id, UserDTO userDTO) {
-
         Optional<User> user = userRepo.findById(id);
-        if (!user.isPresent()) {
-                throw new UserNotPresentException("NO User Detalis Present", HttpStatus.NO_CONTENT);
-            }
-        userRepo.save(user.get());
-            return user.get();
+        if (user == null) {
+            throw new UserNotPresentException("NO User Detalis Present", HttpStatus.NO_CONTENT);
         }
+        user.get().setUserName(userDTO.getUserName());
+        user.get().setFirstName(userDTO.getFirstName());
+        user.get().setLastName(userDTO.getLastName());
+        user.get().setAddress(userDTO.getAddress());
+        user.get().setCompanyName(userDTO.getCompanyName());
+        user.get().setJobType(userDTO.getJobType());
+        user.get().setSalary(userDTO.getSalary());
+        userRepo.save(user.get());
+        return user.get();
+    }
+
+    public void deleteUser(Long id){
+        Optional<User> user = userRepo.findById(id);
+        if(user == null){
+            throw new UserNotPresentException("User not present", HttpStatus.NO_CONTENT);
+        }
+        userRepo.delete(user.get());
+    }
+
+
 }

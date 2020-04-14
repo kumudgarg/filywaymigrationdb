@@ -15,8 +15,14 @@ services:
       - MYSQL_URI=jdbc:mysql://db/flyway_demo
       - MYSQL_USER=kumud
       - MYSQL_PASSWORD=kumud
+      - spring.rabbitmq.host=rabbitmq
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=guest
+      - spring.rabbitmq.password=guest
     depends_on:
+      - rabbitmq
       - mydb
+      - flyway_migration
     volumes:
       - /data/user_info
     networks:
@@ -50,10 +56,14 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-    image: 'rabbitmq:management'
+    image: rabbitmq:3-management-alpine
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - 5672:5672
+      - 15672:15672
     networks:
       - user-mysql
-
+    healthcheck:
+      test: ['CMD-SHELL', 'rabbitmqctl status']
+      timeout: 5s
+      interval: 15s
+      retries: 30

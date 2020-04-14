@@ -25,4 +25,16 @@ public class UserDTO {
 
     private String salary;
 
+    public UserDTO() {
+    }
+
+    public UserDTO(String userName, String firstName, String lastName, String address, String companyName, String jobType, String salary) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.companyName = companyName;
+        this.jobType = jobType;
+        this.salary = salary;
+    }
 }
